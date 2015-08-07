@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/zensend/zensend_ruby_api.svg?branch=master)](https://travis-ci.org/zensend/zensend_ruby_api)
 # ZenSend Ruby bindings 
 
 ## Installation
