@@ -39,7 +39,7 @@ First, make sure you require the gem
 ```ruby
 require 'zensend'
 ```
-Then, create an instance of the clien
+Then, create an instance of the client
 ```ruby
 client = ZenSend::Client.new("YOUR API KEY")
 ```
