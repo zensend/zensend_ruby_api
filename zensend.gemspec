@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.files        = Dir.glob("lib/**/*")
   s.require_path = 'lib'
   s.homepage     = 'http://rubygems.org/gems/zensend_ruby_api'
-  s.license      = 'FONIX'
+  s.license      = 'MIT'
 
 
   s.add_development_dependency 'rake'
