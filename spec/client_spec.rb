@@ -3,6 +3,8 @@ require 'spec_helper'
 describe ZenSend do
 
   SMS_URL = "https://api.zensend.io/v3/sendsms"
+  KEYWORDS_URL = "https://api.zensend.io/v3/keywords"
+
   CHECK_BALANCE_URL = "https://api.zensend.io/v3/checkbalance"
 
   PRICES_URL = "https://api.zensend.io/v3/prices"
@@ -10,6 +12,50 @@ describe ZenSend do
 
   before(:each) do
     @client = ZenSend::Client.new("API_KEY")
+  end
+
+  it "should be able to create a keyword" do
+
+    stub_request(:post, KEYWORDS_URL).
+      to_return(:headers => {'Content-Type' => "application/json"}, :body => '{
+      "success": {
+          "cost_in_pence": 5.4,
+          "new_balance_in_pence": 10.2
+      }
+    }')
+
+    
+
+    result = @client.create_keyword(shortcode: "SC", keyword: "KW")
+
+    expect(result.cost_in_pence).to eq(5.4)
+    expect(result.new_balance_in_pence).to eq(10.2)
+
+    expect(WebMock).to have_requested(:post, KEYWORDS_URL).
+      with(:body => "SHORTCODE=SC&KEYWORD=KW", :headers => {'X-API-KEY' => "API_KEY"})
+
+  end
+
+  it "should be able to create a keyword with options" do
+
+    stub_request(:post, KEYWORDS_URL).
+      to_return(:headers => {'Content-Type' => "application/json"}, :body => '{
+      "success": {
+          "cost_in_pence": 5.4,
+          "new_balance_in_pence": 10.2
+      }
+    }')
+
+    
+
+    result = @client.create_keyword(shortcode: "SC", keyword: "KW", is_sticky: true, mo_url: "http://mo")
+
+    expect(result.cost_in_pence).to eq(5.4)
+    expect(result.new_balance_in_pence).to eq(10.2)
+
+    expect(WebMock).to have_requested(:post, KEYWORDS_URL).
+      with(:body => "SHORTCODE=SC&KEYWORD=KW&IS_STICKY=true&MO_URL=http%3A%2F%2Fmo", :headers => {'X-API-KEY' => "API_KEY"})
+
   end
 
   it "should be able to send an sms" do
