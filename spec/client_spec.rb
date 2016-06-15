@@ -279,7 +279,58 @@ describe ZenSend do
       expect(error.new_balance_in_pence).to eq(100.0)
     end
 
+  end
+
+  it "should be able to create a msisdn verification" do
+    stub_request(:post, "https://verify.zensend.io/api/msisdn_verify").
+      to_return(:status => 200, :headers => {'Content-Type' => "application/json"}, :body => '{
+      "success": {
+          "session": "SESS"
+      }
+    }')
+
+    result = @client.create_msisdn_verification("441234567890")
+
+    expect(result).to eq("SESS")
+    expect(WebMock).to have_requested(:post, "https://verify.zensend.io/api/msisdn_verify").
+      with(:body => "NUMBER=441234567890", :headers => {'X-API-KEY' => "API_KEY"})
 
   end
+
+
+  it "should be able to create a msisdn verification with options" do
+    stub_request(:post, "https://verify.zensend.io/api/msisdn_verify").
+      to_return(:status => 200, :headers => {'Content-Type' => "application/json"}, :body => '{
+      "success": {
+          "session": "SESS"
+      }
+    }')
+
+    result = @client.create_msisdn_verification("441234567890", message: "msg", originator: "orig")
+
+    expect(result).to eq("SESS")
+    expect(WebMock).to have_requested(:post, "https://verify.zensend.io/api/msisdn_verify").
+      with(:body => "NUMBER=441234567890&MESSAGE=msg&ORIGINATOR=orig", :headers => {'X-API-KEY' => "API_KEY"})
+
+  end
+
+
+  it "should be able to check a verification" do
+    stub_request(:get, "https://verify.zensend.io/api/msisdn_verify?SESSION=SESS").
+      to_return(:status => 200, :headers => {'Content-Type' => "application/json"}, :body => '{
+      "success": {
+          "msisdn": "441234567890"
+      }
+    }')
+
+    result = @client.msisdn_verification_status("SESS")
+
+    expect(result).to eq("441234567890")
+    expect(WebMock).to have_requested(:get, "https://verify.zensend.io/api/msisdn_verify?SESSION=SESS").
+      with(:headers => {'X-API-KEY' => "API_KEY"})
+
+  end
+
+
 
 end

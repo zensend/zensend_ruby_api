@@ -7,14 +7,41 @@ module ZenSend
   class Client
 
     ZENSEND_URL     = "https://api.zensend.io"
+    VERIFY_URL = "https://verify.zensend.io"
 
     attr_accessor :api_key, :url, :http_opts
     
-    def initialize(api_key, http_opts = {open_timeout: 60, read_timeout: 60}, url = ZENSEND_URL)
+    def initialize(api_key, http_opts = {open_timeout: 60, read_timeout: 60}, url = ZENSEND_URL, verify_url = VERIFY_URL)
       @api_key = api_key
       @url = url
       @http_opts = http_opts
+      @verify_url = verify_url
     end
+
+    VERIFY_OPTIONS = [:message, :originator]
+
+    def create_msisdn_verification(msisdn, verify_options = {})
+      params = {}
+      params["NUMBER"] = msisdn
+      add_optional_param(params, verify_options, "MESSAGE", :message)
+      add_optional_param(params, verify_options, "ORIGINATOR", :originator)
+
+      verify_options.keys.each do |key|
+        raise ArgumentError.new("unknown option: #{key}") if !VERIFY_OPTIONS.include?(key)
+      end
+
+      result = make_request("/api/msisdn_verify", :post, params, @verify_url)
+
+      result["session"]
+    end
+
+    def msisdn_verification_status(session)
+      params = {"SESSION" => session}
+      json = make_request("/api/msisdn_verify?" + URI.encode_www_form(params), :get, nil, @verify_url)
+      json["msisdn"]
+    end
+
+
 
     ##
     # Sends an sms message
@@ -92,8 +119,10 @@ module ZenSend
       options[param]
     end
 
-    def make_request(path, method, params = {})
-      uri = URI("#{@url}#{path}")
+    def make_request(path, method, params = {}, base_url = nil)
+
+      base_url = base_url || @url
+      uri = URI("#{base_url}#{path}")
 
       response = Net::HTTP.start(uri.hostname, uri.port, @http_opts.merge(:use_ssl => uri.scheme == "https")) {|http|
 
