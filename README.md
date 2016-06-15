@@ -24,6 +24,8 @@ bundle exec rake build
 
 Test cases can be run with: `bundle exec rake spec`
 
+Release is performed by: `rake release`
+
 ## Manual Testing
 
 ```ruby
