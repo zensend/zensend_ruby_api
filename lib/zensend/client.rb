@@ -6,11 +6,11 @@ module ZenSend
 
   class Client
 
-    ZENSEND_URL     = "https://api.zensend.io"
+    ZENSEND_URL = "https://api.zensend.io"
     VERIFY_URL = "https://verify.zensend.io"
 
     attr_accessor :api_key, :url, :http_opts
-    
+
     def initialize(api_key, http_opts = {open_timeout: 60, read_timeout: 60}, url = ZENSEND_URL, verify_url = VERIFY_URL)
       @api_key = api_key
       @url = url
@@ -45,7 +45,7 @@ module ZenSend
 
     ##
     # Sends an sms message
-    # 
+    #
     # Named paramters:
     #  originator: the originator to send from
     #  body: the body of the sms message
@@ -54,7 +54,7 @@ module ZenSend
     #  timetolive_in_minutes: number of minutes before message expires (not required)
     #  encoding: :ucs2 or :gsm (not required defaults to automatic)
     #
-    # A ZenSend::ZenSendException or StandardError or ArgumentError can be raised by this 
+    # A ZenSend::ZenSendException or StandardError or ArgumentError can be raised by this
     # method. StandardError is raised by net/http. It may be one of the following subclasses:
     # [Errno::ETIMEDOUT, Errno::ECONNRESET, Errno::EHOSTUNREACH, SocketError, Net::ReadTimeout, Net::OpenTimeout]
     # This list is not exhaustive.
@@ -80,12 +80,12 @@ module ZenSend
       sms_response = SmsResponse.new
 
       params = {"ORIGINATOR" => originator, "BODY" => body, "NUMBERS" => numbers.join(",")}
-      
+
       add_optional_param(params, options, "ORIGINATOR_TYPE", :originator_type)
       add_optional_param(params, options, "TIMETOLIVE", :timetolive_in_minutes)
       add_optional_param(params, options, "ENCODING", :encoding)
 
-      
+
 
       sms_response.set_from_response(make_request("/v3/sendsms", :post, params))
 
@@ -106,6 +106,13 @@ module ZenSend
       operator_lookup_response = OperatorLookupResponse.new
       operator_lookup_response.set_from_response(make_request("/v3/operator_lookup?" + URI.encode_www_form({"NUMBER" => msisdn}), :get))
       operator_lookup_response
+    end
+
+    def create_sub_account(name)
+      created_sub_account_response = SubAccountCreationResponse.new
+      response = make_request("/v3/sub_accounts", :post, {"NAME" => name.to_s})
+      created_sub_account_response.set_from_response(response)
+      created_sub_account_response
     end
 
     private

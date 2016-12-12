@@ -8,6 +8,8 @@ describe ZenSend do
   PRICES_URL = "https://api.zensend.io/v3/prices"
   OPERATOR_LOOKUP_URL = "https://api.zensend.io/v3/operator_lookup"
 
+  CREATE_SUB_ACCOUNT = "https://api.zensend.io/v3/sub_accounts"
+
   before(:each) do
     @client = ZenSend::Client.new("API_KEY")
   end
@@ -26,7 +28,7 @@ describe ZenSend do
       }
     }')
 
-    
+
 
     result = @client.send_sms(originator: "ORIG", body: "BODY", numbers: ["447796354848"])
 
@@ -80,7 +82,7 @@ describe ZenSend do
       }
     }')
 
-    
+
 
     @client.send_sms(originator: "ORIG", body: "BODY", numbers: ["447796354848", "447796354849"])
 
@@ -96,26 +98,26 @@ describe ZenSend do
 
 
 
-    
+
 
     expect {@client.send_sms(originator: "ORIG", body: "BODY", numbers: ["44779635484,8", "447796354849"])}
       .to raise_error(ArgumentError)
 
 
-   
+
   end
 
   it "should generate an error if an unknown parameter is included" do
 
 
 
-    
+
 
     expect {@client.send_sms(originator: "ORIG", body: "BODY", timetolive: "128", numbers:["447796354848"])}
       .to raise_error(ArgumentError)
 
 
-   
+
   end
 
 
@@ -331,6 +333,25 @@ describe ZenSend do
 
   end
 
+  it "should be able to create sub account" do
+    stub_request(:post, CREATE_SUB_ACCOUNT).
+      to_return(:headers => {'Content-Type' => "application/json"}, :body => '{
+      "success": {
+          "name": "sub account name",
+          "api_key": "SUB_API_KEY"
+      }
+    }')
+
+    response = @client.create_sub_account("sub account name")
+
+    expect(response.name).to eq("sub account name")
+    expect(response.api_key).to eq("SUB_API_KEY")
+    expect(WebMock).to have_requested(:post, CREATE_SUB_ACCOUNT).
+      with(
+        :body => 'NAME=sub+account+name',
+        :headers => {"X-API-KEY" => "API_KEY"}
+      )
+  end
 
 
 end
