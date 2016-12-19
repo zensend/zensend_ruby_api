@@ -110,7 +110,7 @@ module ZenSend
 
     def create_sub_account(name)
       created_sub_account_response = SubAccountCreationResponse.new
-      response = make_request("/v3/sub_accounts", :post, {"NAME" => name.to_s})
+      response = make_request("/v3/sub_accounts", :post, {"NAME" => name})
       created_sub_account_response.set_from_response(response)
       created_sub_account_response
     end
