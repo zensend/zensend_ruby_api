@@ -92,6 +92,27 @@ module ZenSend
       sms_response
     end
 
+    VALID_KEYWORD_OPTIONS = [:shortcode, :keyword, :is_sticky, :mo_url]
+
+    def create_keyword(options)
+      shortcode = required_param(options, :shortcode)
+      keyword = required_param(options, :keyword)
+
+      options.keys.each do |key|
+        raise ArgumentError.new("unknown option: #{key}") if !VALID_KEYWORD_OPTIONS.include?(key)
+      end
+
+      params = {"SHORTCODE" => shortcode, "KEYWORD" => keyword}
+
+      add_optional_param(params, options, "IS_STICKY", :is_sticky)   
+      add_optional_param(params, options, "MO_URL", :mo_url)
+
+      create_keyword_response = CreateKeywordResponse.new
+      create_keyword_response.set_from_response(make_request("/v3/keywords", :post, params))
+
+      create_keyword_response
+    end
+
     def check_balance
       response = make_request("/v3/checkbalance", :get)
       response["balance"]
