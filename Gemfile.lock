@@ -45,3 +45,6 @@ DEPENDENCIES
   simplecov
   webmock
   zensend!
+
+BUNDLED WITH
+   1.13.3
